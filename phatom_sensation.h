@@ -6,10 +6,10 @@ class PhatomSensation {
 public:
     enum class Pattern {
         Constant = 0,
-        PulseSlow = 1,
-        PulseFast = 2,
-        RampUp = 3,
-        RampDown = 4
+        SinePulse = 1,
+        SawUp = 2,
+        SawDown = 3,
+        HeavyShot = 4
     };
     PhatomSensation(uint8_t pin1, uint8_t pin2);
     void off();
@@ -17,6 +17,7 @@ public:
     void update_position(float pos);
     void update_intensity(float intens);
     void update_pattern(PhatomSensation::Pattern p);
+    void update_pattern_period(int ms);
 
     void process();
 
@@ -26,7 +27,10 @@ private:
 
     float position = 0.5f;
     float intensity = 1.0;
+
     PhatomSensation::Pattern pattern = PhatomSensation::Pattern::Constant;
-    int pattern_idx = 0;
+    uint8_t pattern_idx = 0;
+    int pattern_period_ms = 100;
+    
     float pattern_bias();
 };

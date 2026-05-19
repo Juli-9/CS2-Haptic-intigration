@@ -1,19 +1,33 @@
 #include "phatom_sensation.h"
+#include "timer.h"
 
 PhatomSensation ps(13, 12);
+// Timer t;
 
 void setup() {
-  Serial.begin(9600);
-  ps.update_intensity(.15);
+  // Serial.begin(9600);
+  ps.update_intensity(1);
+  ps.update_pattern_period(1500);
+  ps.update_pattern(PhatomSensation::Pattern::HeavyShot);
+
 }
 
 void loop() {
-  for(float i = 0.0; i < 1.0; i+=0.01){
-    ps.update_position(i);
-    ps.process();
-    Serial.println(i);
-    delay(100);
-  }
-  ps.off();
-  delay(1000);
+  ps.process();
+
+
+  // t.start(100);
+  // for(float i = 0.0; i < 1.0;){
+  //   if (t.isFinished()){
+  //     t.start(100);
+  //     ps.update_position(i);
+  //     i += 0.01;
+  //   } 
+
+  //   ps.process();
+  //   Serial.println(i);
+  // }
+  // ps.off();
+  // ps.update_position(0);
+  // delay(1000);
 }
