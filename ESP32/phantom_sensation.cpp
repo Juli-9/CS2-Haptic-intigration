@@ -1,8 +1,6 @@
 #include <Arduino.h>
 
-#include "phatom_sensation.h"
-
-Timer t;
+#include "phantom_sensation.h"
 
 static const uint8_t logLUT[256] =
 {
@@ -143,7 +141,7 @@ const uint8_t heavyShotLUT[256] = {
   0, 0, 0, 0, 0, 0, 0, 0
 };
 
-PhatomSensation::PhatomSensation(uint8_t pin1, uint8_t pin2)
+PhantomSensation::PhantomSensation(uint8_t pin1, uint8_t pin2)
 {
     motor1_pin = pin1;
     motor2_pin = pin2;
@@ -154,31 +152,32 @@ PhatomSensation::PhatomSensation(uint8_t pin1, uint8_t pin2)
     off();
 }
 
-void PhatomSensation::off(){
+void PhantomSensation::off(){
     analogWrite(motor1_pin, 0);
     analogWrite(motor2_pin, 0);
 }
 
-void PhatomSensation::update_position(float pos)
+void PhantomSensation::update_position(float pos)
 {
     position = constrain(pos, 0.0f, 1.0f);
 }
 
-void PhatomSensation::update_intensity(float intens){
+void PhantomSensation::update_intensity(float intens){
     intensity = constrain(intens, 0.0f, 1.0f);
 }
 
-void PhatomSensation::update_pattern(PhatomSensation::Pattern p){
+void PhantomSensation::update_pattern(PhantomSensation::Pattern p){
+    t.reset();
     pattern_idx = 0;
     pattern = p;
 }
 
-void PhatomSensation::update_pattern_period(int ms){
+void PhantomSensation::update_pattern_period(int ms){
     t.start(ms);
     pattern_period_ms = ms;
 }
 
-void PhatomSensation::process(){
+void PhantomSensation::process(){
     float pos = position;
     float gain1 = pos;
     float gain2 = 1.0 - pos;
@@ -216,26 +215,26 @@ void PhatomSensation::process(){
     analogWrite(motor2_pin, pwm2);
 }
 
-float PhatomSensation::pattern_bias(){
+float PhantomSensation::pattern_bias(){
     switch (pattern) {
-        case PhatomSensation::Pattern::Constant: 
+        case PhantomSensation::Pattern::Constant: 
             return 1.0f;
         break;
 
-        case PhatomSensation::Pattern::SinePulse: 
+        case PhantomSensation::Pattern::SinePulse: 
             return float(sinLUT[pattern_idx]) / 255.0f;
         break;
 
-        case PhatomSensation::Pattern::SawUp: 
+        case PhantomSensation::Pattern::SawUp: 
             return float(sawUpLUT[pattern_idx]) / 255.0f;
         break;
 
         
-        case PhatomSensation::Pattern::SawDown: 
+        case PhantomSensation::Pattern::SawDown: 
             return float(sawDownLUT[pattern_idx]) / 255.0f;
         break;
                 
-        case PhatomSensation::Pattern::HeavyShot: 
+        case PhantomSensation::Pattern::HeavyShot: 
             return float(heavyShotLUT[pattern_idx]) / 255.0f;
         break;
 

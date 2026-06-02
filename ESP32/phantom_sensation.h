@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include "timer.h"
 
-class PhatomSensation {
+class PhantomSensation {
 public:
     enum class Pattern {
         Constant = 0,
@@ -12,12 +12,12 @@ public:
         SawDown = 3,
         HeavyShot = 4
     };
-    PhatomSensation(uint8_t pin1, uint8_t pin2);
+    PhantomSensation(uint8_t pin1, uint8_t pin2);
     void off();
 
     void update_position(float pos);
     void update_intensity(float intens);
-    void update_pattern(PhatomSensation::Pattern p);
+    void update_pattern(PhantomSensation::Pattern p);
     void update_pattern_period(int ms);
 
     void process();
@@ -29,9 +29,10 @@ private:
     float position = 0.5f;
     float intensity = 1.0;
 
-    PhatomSensation::Pattern pattern = PhatomSensation::Pattern::Constant;
+    PhantomSensation::Pattern pattern = PhantomSensation::Pattern::Constant;
     uint8_t pattern_idx = 0;
     int pattern_period_ms = 100;
+    Timer t;
     
     float pattern_bias();
 };
