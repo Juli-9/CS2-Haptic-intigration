@@ -1,3 +1,5 @@
+#pragma once
+
 class Timer {
 private:
     unsigned long interval = 0;
