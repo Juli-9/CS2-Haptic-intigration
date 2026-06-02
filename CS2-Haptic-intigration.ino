@@ -1,11 +1,11 @@
 #include "phatom_sensation.h"
-#include "timer.h"
+// #include "timer.h"
 
 PhatomSensation ps(13, 12);
 // Timer t;
 
 void setup() {
-  // Serial.begin(9600);
+  Serial.begin(9600);
   ps.update_intensity(1);
   ps.update_pattern_period(1500);
   ps.update_pattern(PhatomSensation::Pattern::HeavyShot);
