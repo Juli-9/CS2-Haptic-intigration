@@ -1,14 +1,6 @@
-from enum import Enum, auto
 import tkinter as tk
 import json
 import serial
-
-class FiringPattern(Enum):
-    CONSTANT = auto()
-    SINEPULSE = auto()
-    SAWUP = auto()
-    SAWDOWN = auto()
-    HEAVYSHOT = auto()
 
 #------------Arduino connection--------------
 
@@ -16,46 +8,56 @@ ser = serial.Serial("COM5", 115200)
 
 dataToSend = {
     "isFiring": False,
-    "firingPeriod": 100,
+    "firingPeriod": 10,
     "firingPattern": 0,
-    "ammunitionPercent": 0
+    "ammunitionPercent": 0,
+    "intensityPercent": 0
 }
 
 #-----------------Functions-----------------
+
+def updateOutput():
+    line = ser.readline()
+    if line:
+        text = line.decode('utf-8', errors='ignore').strip()
+        if text:
+            print(text)
 
 def vibrationON():
     dataToSend["isFiring"] = True
     json_string:str = json.dumps(dataToSend) + "\n"
     ser.write(json_string.encode())
+    updateOutput()
 def vibrationOFF():
     dataToSend["isFiring"] = False
     json_string:str = json.dumps(dataToSend) + "\n"
     ser.write(json_string.encode())
+    updateOutput()
 def setAmmoPercent():
-    dataToSend["ammunitionPercent"] = float(AMMOPercent.get())
+    dataToSend["ammunitionPercent"] = int(AMMOPercent.get())
     json_string:str = json.dumps(dataToSend) + "\n"
     ser.write(json_string.encode())
+    updateOutput()
 def updatePattern():
-    patternToMatch:str = str(FIRINGPattern.get())
-    match patternToMatch:
-        case "Constant":
-            dataToSend["firingPattern"] = FiringPattern.CONSTANT.value
-        case "SinePulse":
-            dataToSend["firingPattern"] = FiringPattern.SINEPULSE.value
-        case "SawUp":
-            dataToSend["firingPattern"] = FiringPattern.SAWUP.value
-        case "SawDown":
-            dataToSend["firingPattern"] = FiringPattern.SAWDOWN.value
-        case "HeavyShot":
-            dataToSend["firingPattern"] = FiringPattern.HEAVYSHOT.value
+    dataToSend["firingPattern"] = int(FIRINGPattern.get())
     json_string:str = json.dumps(dataToSend) + "\n"
     ser.write(json_string.encode())
+    updateOutput()
+def updateIntensity():
+    dataToSend["intensityPercent"] = int(INTENSITYPercent.get())
+    json_string:str = json.dumps(dataToSend) + "\n"
+    ser.write(json_string.encode())
+    updateOutput()
+def updatePeriod():
+    dataToSend["firingPeriod"] = int(FIRINGPeriod.get())
+    json_string:str = json.dumps(dataToSend) + "\n"
+    ser.write(json_string.encode())
+    updateOutput()
 
 #Sine, SawUp, SawDown, HeavyShot
 
 #------------GUI-------------
 win = tk.Tk()
-
 win.title("CS haptic feedback debug")
 win.minsize(240,240)
 
@@ -73,10 +75,28 @@ tk.Label(win, text="Ammo (%)").grid(column=2, row=3)
 AMMOPercentUpdate = tk.Button(win, bd=4, text="Update", command=setAmmoPercent)
 AMMOPercentUpdate.grid(column=1, row=4)
 
-FIRINGPattern = tk.Entry(win, bd=6, width=12)
+FIRINGPattern = tk.Scale(win, bd=5, from_=0, to=4, orient=tk.HORIZONTAL)
 FIRINGPattern.grid(column=1, row=5)
-tk.Label(win, text="Choose firing pattern").grid(column=2, row=5)
+tk.Label(win, text="0 = Constant; 1 = SinePulse;\n2 = SawUp; 3 = SawDown; 4 = HeavyShot").grid(column=2, row=5)
 FIRINGPatternUpdate = tk.Button(win, bd=4, text="Update", command=updatePattern)
 FIRINGPatternUpdate.grid(column=1, row=6)
+
+INTENSITYPercent = tk.Scale(win, bd=5, from_=0, to=100, orient=tk.HORIZONTAL)
+INTENSITYPercent.grid(column=1, row=7)
+tk.Label(win, text="Intensity (%)").grid(column=2, row=7)
+INTENSITYPercentUpdate = tk.Button(win, bd=4, text="Update", command=updateIntensity)
+INTENSITYPercentUpdate.grid(column=1, row=8)
+
+FIRINGPeriod = tk.Scale(win, bd=5, from_=10, to=2000, orient=tk.HORIZONTAL)
+FIRINGPeriod.grid(column=1, row=9)
+tk.Label(win, text="Firing period (ms)").grid(column=2, row=9)
+FIRINGPeriodUpdate = tk.Button(win, bd=4, text="Update", command=updatePeriod)
+FIRINGPeriodUpdate.grid(column=1, row=10)
+
+# FIRINGPattern = tk.Entry(win, bd=6, width=12)
+# FIRINGPattern.grid(column=1, row=5)
+# tk.Label(win, text="Choose firing pattern").grid(column=2, row=5)
+# FIRINGPatternUpdate = tk.Button(win, bd=4, text="Update", command=updatePattern)
+# FIRINGPatternUpdate.grid(column=1, row=6)
 
 win.mainloop()
