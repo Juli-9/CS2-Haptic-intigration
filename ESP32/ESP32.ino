@@ -20,7 +20,7 @@ PhantomSensation::Pattern prev_firingPattern = PhantomSensation::Pattern::Consta
 
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   ps.update_intensity(1);
   ps.update_pattern_period(1500);
   ps.update_pattern(PhantomSensation::Pattern::HeavyShot);
@@ -42,7 +42,8 @@ void loop() {
 
 bool readJsonFromSerial(JsonDocument &doc) {
 
-  if (!Serial.available()) return false;
+  // while (Serial.available()) {
+  if(!Serial.available()) return false;
 
     char c = Serial.read();
 
@@ -53,7 +54,7 @@ bool readJsonFromSerial(JsonDocument &doc) {
     }
 
     JSONbuffer += c;
-
+  // }
   return false;
 }
 
@@ -64,17 +65,8 @@ void update_states() {
     ammunitionPercent = json["ammunitionPercent"];
     intensityPercent = json["intensityPercent"];
 
-    Serial.print("isFiring: ");
-    Serial.print(isFiring);
-
-    Serial.print("firingPeriod: ");
-    Serial.print(firingPeriod);
-
-    Serial.print("firingPattern: ");
-    Serial.print(int(firingPattern));
-
-    Serial.print("ammunitionPercent: ");
-    Serial.print(ammunitionPercent);
+    serializeJson(json, Serial);
+    Serial.print("\n");
 }
 
 void update_phatom_senstaion(){
