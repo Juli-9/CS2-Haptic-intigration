@@ -157,6 +157,10 @@ void PhantomSensation::off(){
     analogWrite(motor2_pin, 0);
 }
 
+void PhantomSensation::update_isFiring(bool firing){
+    isFiring = firing;
+}
+
 void PhantomSensation::update_position(float pos)
 {
     position = constrain(pos, 0.0f, 1.0f);
@@ -211,8 +215,13 @@ void PhantomSensation::process(){
     // Serial.println(pwm2);
     // Serial.println("------");
 
-    analogWrite(motor1_pin, pwm1);
-    analogWrite(motor2_pin, pwm2);
+    if(isFiring) {
+        analogWrite(motor1_pin, pwm1);
+        analogWrite(motor2_pin, pwm2);
+    } else {
+        analogWrite(motor1_pin, 0);
+        analogWrite(motor2_pin, 0);
+    }
 }
 
 float PhantomSensation::pattern_bias(){

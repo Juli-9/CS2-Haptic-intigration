@@ -15,6 +15,7 @@ public:
     PhantomSensation(uint8_t pin1, uint8_t pin2);
     void off();
 
+    void update_isFiring(bool firing);
     void update_position(float pos);
     void update_intensity(float intens);
     void update_pattern(PhantomSensation::Pattern p);
@@ -26,6 +27,7 @@ private:
     uint8_t motor1_pin;
     uint8_t motor2_pin;
 
+    bool isFiring = false;
     float position = 0.5f;
     float intensity = 1.0;
 

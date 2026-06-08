@@ -20,7 +20,8 @@ PhantomSensation::Pattern prev_firingPattern = PhantomSensation::Pattern::Consta
 
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
+  ps.update_isFiring(isFiring);
   ps.update_intensity(1);
   ps.update_pattern_period(1500);
   ps.update_pattern(PhantomSensation::Pattern::HeavyShot);
@@ -70,6 +71,7 @@ void update_states() {
 }
 
 void update_phatom_senstaion(){
+  ps.update_isFiring(bool(isFiring));
   ps.update_position(float(ammunitionPercent) * 0.01f);
   ps.update_intensity(float(intensityPercent) * 0.01f);
 

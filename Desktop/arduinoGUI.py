@@ -4,7 +4,7 @@ import serial
 
 #------------Arduino connection--------------
 
-ser = serial.Serial("COM5", 115200)
+ser = serial.Serial("COM6", 9600)
 
 dataToSend = {
     "isFiring": False,
@@ -19,7 +19,7 @@ dataToSend = {
 def updateOutput():
     line = ser.readline()
     if line:
-        text = line.decode('utf-8', errors='ignore').strip()
+        text = line.decode('utf-8').strip()
         if text:
             print(text)
 
@@ -33,23 +33,23 @@ def vibrationOFF():
     json_string:str = json.dumps(dataToSend) + "\n"
     ser.write(json_string.encode())
     updateOutput()
-def setAmmoPercent():
-    dataToSend["ammunitionPercent"] = int(AMMOPercent.get())
+def updateAmmoPercent(val):
+    dataToSend["ammunitionPercent"] = int(val)
     json_string:str = json.dumps(dataToSend) + "\n"
     ser.write(json_string.encode())
     updateOutput()
-def updatePattern():
-    dataToSend["firingPattern"] = int(FIRINGPattern.get())
+def updatePattern(val):
+    dataToSend["firingPattern"] = int(val)
     json_string:str = json.dumps(dataToSend) + "\n"
     ser.write(json_string.encode())
     updateOutput()
-def updateIntensity():
-    dataToSend["intensityPercent"] = int(INTENSITYPercent.get())
+def updateIntensity(val):
+    dataToSend["intensityPercent"] = int(val)
     json_string:str = json.dumps(dataToSend) + "\n"
     ser.write(json_string.encode())
     updateOutput()
-def updatePeriod():
-    dataToSend["firingPeriod"] = int(FIRINGPeriod.get())
+def updatePeriod(val):
+    dataToSend["firingPeriod"] = int(val)
     json_string:str = json.dumps(dataToSend) + "\n"
     ser.write(json_string.encode())
     updateOutput()
@@ -69,34 +69,21 @@ ONbtn.grid(column=1, row=2)
 OFFbtn = tk.Button(win, bd=4, text="TEST AR OFF", command=vibrationOFF)
 OFFbtn.grid(column=2, row=2)
 
-AMMOPercent = tk.Scale(win, bd=5, from_=0, to=100, orient=tk.HORIZONTAL)
+ammoVal = tk.IntVar()
+AMMOPercent = tk.Scale(win, bd=5, from_=0, to=100, orient=tk.HORIZONTAL, command=updateAmmoPercent)
 AMMOPercent.grid(column=1, row=3)
 tk.Label(win, text="Ammo (%)").grid(column=2, row=3)
-AMMOPercentUpdate = tk.Button(win, bd=4, text="Update", command=setAmmoPercent)
-AMMOPercentUpdate.grid(column=1, row=4)
 
-FIRINGPattern = tk.Scale(win, bd=5, from_=0, to=4, orient=tk.HORIZONTAL)
+FIRINGPattern = tk.Scale(win, bd=5, from_=0, to=4, orient=tk.HORIZONTAL, command=updatePattern)
 FIRINGPattern.grid(column=1, row=5)
 tk.Label(win, text="0 = Constant; 1 = SinePulse;\n2 = SawUp; 3 = SawDown; 4 = HeavyShot").grid(column=2, row=5)
-FIRINGPatternUpdate = tk.Button(win, bd=4, text="Update", command=updatePattern)
-FIRINGPatternUpdate.grid(column=1, row=6)
 
-INTENSITYPercent = tk.Scale(win, bd=5, from_=0, to=100, orient=tk.HORIZONTAL)
+INTENSITYPercent = tk.Scale(win, bd=5, from_=0, to=100, orient=tk.HORIZONTAL, command=updateIntensity)
 INTENSITYPercent.grid(column=1, row=7)
 tk.Label(win, text="Intensity (%)").grid(column=2, row=7)
-INTENSITYPercentUpdate = tk.Button(win, bd=4, text="Update", command=updateIntensity)
-INTENSITYPercentUpdate.grid(column=1, row=8)
 
-FIRINGPeriod = tk.Scale(win, bd=5, from_=10, to=2000, orient=tk.HORIZONTAL)
+FIRINGPeriod = tk.Scale(win, bd=5, from_=10, to=2000, orient=tk.HORIZONTAL, command=updatePeriod)
 FIRINGPeriod.grid(column=1, row=9)
 tk.Label(win, text="Firing period (ms)").grid(column=2, row=9)
-FIRINGPeriodUpdate = tk.Button(win, bd=4, text="Update", command=updatePeriod)
-FIRINGPeriodUpdate.grid(column=1, row=10)
-
-# FIRINGPattern = tk.Entry(win, bd=6, width=12)
-# FIRINGPattern.grid(column=1, row=5)
-# tk.Label(win, text="Choose firing pattern").grid(column=2, row=5)
-# FIRINGPatternUpdate = tk.Button(win, bd=4, text="Update", command=updatePattern)
-# FIRINGPatternUpdate.grid(column=1, row=6)
 
 win.mainloop()
