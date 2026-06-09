@@ -17,11 +17,12 @@ dataToSend = {
 #-----------------Functions-----------------
 
 def updateOutput():
-    line = ser.readline()
-    if line:
-        text = line.decode('utf-8', errors='ignore').strip()
-        if text:
-            print(text)
+    print(dataToSend)
+    # line = ser.readline()
+    # if line:
+    #     text = line.decode('utf-8', errors='ignore').strip()
+    #     if text:
+    #         print(text)
 
 def vibrationON():
     dataToSend["isFiring"] = True
