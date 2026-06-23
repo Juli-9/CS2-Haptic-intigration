@@ -17,8 +17,7 @@ public:
 
     void update_position(float pos);
     void update_intensity(float intens);
-    void update_pattern(PhantomSensation::Pattern p);
-    void update_pattern_period(int ms);
+    void update_pattern(PhantomSensation::Pattern p, int period, bool oneShot);
 
     void process();
 
@@ -28,6 +27,8 @@ private:
 
     float position = 0.5f;
     float intensity = 1.0;
+
+    bool one_shot = false;
 
     PhantomSensation::Pattern pattern = PhantomSensation::Pattern::Constant;
     uint8_t pattern_idx = 0;

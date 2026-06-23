@@ -166,16 +166,17 @@ void PhantomSensation::update_intensity(float intens){
     intensity = constrain(intens, 0.0f, 1.0f);
 }
 
-void PhantomSensation::update_pattern(PhantomSensation::Pattern p){
-    t.reset();
+void PhantomSensation::update_pattern(PhantomSensation::Pattern p, int period, bool oneShot){
     pattern_idx = 0;
     pattern = p;
+
+    pattern_period_ms = period;
+
+    one_shot = oneShot;
+    
+    t.start(period);
 }
 
-void PhantomSensation::update_pattern_period(int ms){
-    t.start(ms);
-    pattern_period_ms = ms;
-}
 
 void PhantomSensation::process(){
     float pos = position;
@@ -185,6 +186,9 @@ void PhantomSensation::process(){
     // float -> 8 Bit
     uint8_t idx1 = (uint8_t)(gain1 * 255.0f);
     uint8_t idx2 = (uint8_t)(gain2 * 255.0f);
+
+    float p = t.progress();
+    pattern_idx = (uint8_t)(p * 255.0f);
 
     // logarithmische LUT
     uint8_t pwm1 = logLUT[idx1] * intensity * pattern_bias();
@@ -197,14 +201,16 @@ void PhantomSensation::process(){
     // Serial.print(" progress=");
     // Serial.println(t.progress());
 
-    float p = t.progress();
 
     if (p >= 1.0f) {
+        if(one_shot){
+            this->off();
+            return;
+        }
         t.reset();
         p = 0.0f;
     }
 
-    pattern_idx = (uint8_t)(p * 255.0f);
 
 
     // Serial.println(pwm1);

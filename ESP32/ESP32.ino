@@ -7,8 +7,10 @@
 PhantomSensation ps(13, 12);
 StaticJsonDocument<256> json;
 String JSONbuffer = "";
+bool new_one_shot_arrived = false;
 
 //prev states
+bool prev_mode = false;
 int prev_firingPeriod = 100;
 PhantomSensation::Pattern prev_firingPattern = PhantomSensation::Pattern::Constant;
 
@@ -30,15 +32,19 @@ void serialTask(void *parameter){
                 xSemaphoreTake(jsonMutex, portMAX_DELAY);
 
                 DeserializationError err = deserializeJson(json, JSONbuffer);
-                
-                // UNLOCK
-                xSemaphoreGive(jsonMutex);
-
-                if (err)
+                if (!err)
+                {
+                  new_one_shot_arrived = json["oneShot"];
+                }
+                else
                 {
                     Serial.print("JSON Fehler: ");
                     Serial.println(err.c_str());
                 }
+                
+                // UNLOCK
+                xSemaphoreGive(jsonMutex);
+
 
                 JSONbuffer = "";
 
@@ -56,10 +62,9 @@ void serialTask(void *parameter){
 }
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(921600);
   ps.update_intensity(1);
-  ps.update_pattern_period(1500);
-  ps.update_pattern(PhantomSensation::Pattern::HeavyShot);
+  ps.update_pattern(PhantomSensation::Pattern::SinePulse, 600, false);
 
   // Mutex erzeugen
   jsonMutex = xSemaphoreCreateMutex();
@@ -92,18 +97,19 @@ void update_phatom_senstaion(){
   ps.update_position(float(json["ammunitionPercent"]) * 0.01f);
   ps.update_intensity(json["isFiring"] ? (float(json["intensityPercent"]) * 0.01f) : (0.0f));
 
-  if (prev_firingPeriod != json["firingPeriod"]) {
-    ps.update_pattern_period(json["firingPeriod"]);
-    prev_firingPeriod = json["firingPeriod"];
-  }
-
   int patternRaw = json["firingPattern"] | 0;
   PhantomSensation::Pattern pattern = static_cast<PhantomSensation::Pattern>(patternRaw);
 
-  if (prev_firingPattern != pattern)
+  if (prev_firingPeriod != json["firingPeriod"] 
+    || prev_firingPattern != pattern 
+    || prev_mode != json["oneShot"]
+    || new_one_shot_arrived) 
   {
-      ps.update_pattern(pattern);
-      prev_firingPattern = pattern;
+    prev_firingPeriod = json["firingPeriod"];
+    prev_firingPattern = pattern;
+    prev_mode = json["oneShot"];
+    ps.update_pattern(pattern, json["firingPeriod"], json["oneShot"]);
+    new_one_shot_arrived = false;
   }
 
   // UNLOCK
