@@ -63,7 +63,8 @@ void serialTask(void *parameter){
 
 void setup() {
   Serial.begin(921600);
-  ps.update_intensity(1);
+  ps.update_intensity(1.0);
+  ps.update_position(1.0);
   ps.update_pattern(PhantomSensation::Pattern::SinePulse, 600, false);
 
   // Mutex erzeugen

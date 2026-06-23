@@ -163,7 +163,7 @@ void PhantomSensation::update_position(float pos)
 }
 
 void PhantomSensation::update_intensity(float intens){
-    intensity = constrain(intens, 0.0f, 1.0f);
+    intensity = constrain(intens, 0.0f, 0.99f);
 }
 
 void PhantomSensation::update_pattern(PhantomSensation::Pattern p, int period, bool oneShot){
@@ -173,34 +173,14 @@ void PhantomSensation::update_pattern(PhantomSensation::Pattern p, int period, b
     pattern_period_ms = period;
 
     one_shot = oneShot;
-    
+
     t.start(period);
 }
 
 
 void PhantomSensation::process(){
-    float pos = position;
-    float gain1 = pos;
-    float gain2 = 1.0 - pos;
-
-    // float -> 8 Bit
-    uint8_t idx1 = (uint8_t)(gain1 * 255.0f);
-    uint8_t idx2 = (uint8_t)(gain2 * 255.0f);
 
     float p = t.progress();
-    pattern_idx = (uint8_t)(p * 255.0f);
-
-    // logarithmische LUT
-    uint8_t pwm1 = logLUT[idx1] * intensity * pattern_bias();
-    uint8_t pwm2 = logLUT[idx2] * intensity * pattern_bias();
-
-    // Serial.print("running=");
-    // Serial.print(t.active());
-    // Serial.print(" dt=");
-    // Serial.print(millis() - t.startTime);
-    // Serial.print(" progress=");
-    // Serial.println(t.progress());
-
 
     if (p >= 1.0f) {
         if(one_shot){
@@ -211,11 +191,25 @@ void PhantomSensation::process(){
         p = 0.0f;
     }
 
+    float pos = position;
+    float gain1 = pos;
+    float gain2 = 1.0 - pos;
 
+    uint8_t idx1 = (uint8_t)(gain1 * 255.0f);
+    uint8_t idx2 = (uint8_t)(gain2 * 255.0f);
 
-    // Serial.println(pwm1);
-    // Serial.println(pwm2);
-    // Serial.println("------");
+    float base1 = logLUT[idx1] / 255.0f;
+    float base2 = logLUT[idx2] / 255.0f;
+
+    pattern_idx = (uint8_t)(p * 255.0f);
+    
+    float value1 = base1 * intensity * pattern_bias();
+    float value2 = base2 * intensity * pattern_bias();
+
+    uint8_t pwm1 = (uint8_t)(value1 * 255.0f);
+    uint8_t pwm2 = (uint8_t)(value2 * 255.0f);
+
+    Serial.println(pwm1 + "," + pwm2);
 
     analogWrite(motor1_pin, pwm1);
     analogWrite(motor2_pin, pwm2);
