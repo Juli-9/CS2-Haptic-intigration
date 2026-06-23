@@ -5,14 +5,15 @@ import time
 
 #------------Arduino connection--------------
 
-ser = serial.Serial("COM3", 115200)
+ser = serial.Serial("COM5", 921600)
 
 dataToSend = {
     "isFiring": False,
     "firingPeriod": 10,
     "firingPattern": 0,
     "ammunitionPercent": 0,
-    "intensityPercent": 0
+    "intensityPercent": 0,
+    "oneShot" : False
 }
 
 # Wird eigentlich nur für Scopen verwendet, unwichtig auf Arduino
@@ -21,7 +22,8 @@ prevDataToSend = {
     "firingPeriod": 10,
     "firingPattern": 0,
     "ammunitionPercent": 0,
-    "intensityPercent": 0
+    "intensityPercent": 0,
+    "oneShot" : False
 }
 
 #-----------------Functions-----------------
@@ -32,6 +34,8 @@ def saveData():
     prevDataToSend["firingPattern"] = dataToSend["firingPattern"]
     prevDataToSend["ammunitionPercent"] = dataToSend["ammunitionPercent"]
     prevDataToSend["intensityPercent"] = dataToSend["intensityPercent"]
+    prevDataToSend["oneShot"] = dataToSend["oneShot"]
+
 
 def loadData():
     dataToSend["isFiring"] = prevDataToSend["isFiring"]
@@ -39,6 +43,7 @@ def loadData():
     dataToSend["firingPattern"] = prevDataToSend["firingPattern"]
     dataToSend["ammunitionPercent"] = prevDataToSend["ammunitionPercent"]
     dataToSend["intensityPercent"] = prevDataToSend["intensityPercent"]
+    dataToSend["oneShot"] = prevDataToSend["oneShot"]
 
 def vibrationON():
     dataToSend["isFiring"] = True
@@ -59,12 +64,13 @@ def scopeONCE():
     dataToSend["firingPeriod"] = 25
     dataToSend["intensityPercent"] = 100
     dataToSend["firingPattern"] = 0
+    dataToSend["oneShot"] = True
     json_string:str = json.dumps(dataToSend) + "\n"
     ser.write(json_string.encode())
-    time.sleep(0.025)
-    dataToSend["isFiring"] = False
-    json_string:str = json.dumps(dataToSend) + "\n"
-    ser.write(json_string.encode())
+    # time.sleep(0.025)
+    # dataToSend["isFiring"] = False
+    # json_string:str = json.dumps(dataToSend) + "\n"
+    # ser.write(json_string.encode())
     print(dataToSend)
     loadData()
 
