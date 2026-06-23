@@ -208,8 +208,10 @@ void PhantomSensation::process(){
 
     uint8_t pwm1 = (uint8_t)(value1 * 255.0f);
     uint8_t pwm2 = (uint8_t)(value2 * 255.0f);
-
-    Serial.println(pwm1 + "," + pwm2);
+    
+    Serial.print(pwm1);
+    Serial.print(",");
+    Serial.println(pwm2);
 
     analogWrite(motor1_pin, pwm1);
     analogWrite(motor2_pin, pwm2);
