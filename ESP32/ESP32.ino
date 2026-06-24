@@ -6,6 +6,7 @@
 //vars
 PhantomSensation ps(13, 12);
 StaticJsonDocument<512> json;
+StaticJsonDocument<512> tmp;
 String JSONbuffer = "";
 bool new_json_arrived = false;
 
@@ -28,20 +29,17 @@ void serialTask(void *parameter){
             // Ende einer Nachricht
             if (c == '\n')
             {
+                DeserializationError err = deserializeJson(tmp, JSONbuffer);
+                
                 // LOCK
                 xSemaphoreTake(jsonMutex, portMAX_DELAY);
 
-                DeserializationError err = deserializeJson(json, JSONbuffer);
                 if (!err)
                 {
+                  json = tmp;
                   new_json_arrived = true;
                 }
-                else
-                {
-                    Serial.print("JSON Fehler: ");
-                    Serial.println(err.c_str());
-                }
-                
+
                 // UNLOCK
                 xSemaphoreGive(jsonMutex);
 
@@ -106,11 +104,21 @@ void update_phatom_senstaion(){
 
     int patternRaw = json["firingPattern"] | 0;
     PhantomSensation::Pattern pattern = static_cast<PhantomSensation::Pattern>(patternRaw);
-    prev_firingPattern = pattern;
 
-    prev_firingPeriod = json["firingPeriod"];
-    prev_mode = json["oneShot"];
-    ps.update_pattern(pattern, json["firingPeriod"], json["oneShot"]);
+    if(prev_firingPattern != pattern
+    || prev_firingPeriod != json["firingPeriod"]
+    || json["oneShot"]
+    || prev_mode)
+    {
+
+        prev_firingPattern = pattern;
+        prev_firingPeriod = json["firingPeriod"];
+        prev_mode = json["oneShot"];
+        ps.update_pattern(pattern, json["firingPeriod"], json["oneShot"]);
+
+    }
+
+
     new_json_arrived = false;
 
     // UNLOCK
