@@ -1,11 +1,9 @@
 #include <Arduino.h>
 
-#include "phantom_sensation.h"
+#include "haptic_controller.h"
 #include "timer.h"
 
-#define SERIAL_COM_FREQ 50
 
-Timer loop_tim;
 
 static const uint8_t logLUT[256] =
 {
@@ -146,7 +144,7 @@ const uint8_t heavyShotLUT[256] = {
   0, 0, 0, 0, 0, 0, 0, 0
 };
 
-PhantomSensation::PhantomSensation(uint8_t pin1, uint8_t pin2)
+HapticController::HapticController(uint8_t pin1, uint8_t pin2)
 {
     motor1_pin = pin1;
     motor2_pin = pin2;
@@ -159,21 +157,21 @@ PhantomSensation::PhantomSensation(uint8_t pin1, uint8_t pin2)
     loop_tim.start(1.0 / float(SERIAL_COM_FREQ) * 1000);
 }
 
-void PhantomSensation::off(){
+void HapticController::off(){
     analogWrite(motor1_pin, 0);
     analogWrite(motor2_pin, 0);
 }
 
-void PhantomSensation::update_position(float pos)
+void HapticController::update_position(float pos)
 {
     position = constrain(pos, 0.0f, 1.0f);
 }
 
-void PhantomSensation::update_intensity(float intens){
+void HapticController::update_intensity(float intens){
     intensity = constrain(intens, 0.0f, 1.0f);
 }
 
-void PhantomSensation::update_pattern(PhantomSensation::Pattern p, int period, bool oneShot){
+void HapticController::update_pattern(HapticController::Pattern p, int period, bool oneShot){
     pattern_idx = 0;
     pattern = p;
 
@@ -184,7 +182,7 @@ void PhantomSensation::update_pattern(PhantomSensation::Pattern p, int period, b
     t.start(period);
 }
 
-void PhantomSensation::process(){
+void HapticController::process(){
 
     float p = t.progress();
 
@@ -244,26 +242,26 @@ void PhantomSensation::process(){
     analogWrite(motor2_pin, pwm2);
 }
 
-float PhantomSensation::pattern_bias(){
+float HapticController::pattern_bias(){
     switch (pattern) {
-        case PhantomSensation::Pattern::Constant: 
+        case HapticController::Pattern::Constant: 
             return 1.0f;
         break;
 
-        case PhantomSensation::Pattern::SinePulse: 
+        case HapticController::Pattern::SinePulse: 
             return float(sinLUT[pattern_idx]) / 255.0f;
         break;
 
-        case PhantomSensation::Pattern::SawUp: 
+        case HapticController::Pattern::SawUp: 
             return float(sawUpLUT[pattern_idx]) / 255.0f;
         break;
 
         
-        case PhantomSensation::Pattern::SawDown: 
+        case HapticController::Pattern::SawDown: 
             return float(sawDownLUT[pattern_idx]) / 255.0f;
         break;
                 
-        case PhantomSensation::Pattern::HeavyShot: 
+        case HapticController::Pattern::HeavyShot: 
             return float(heavyShotLUT[pattern_idx]) / 255.0f;
         break;
 

@@ -1,10 +1,10 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
-#include "phantom_sensation.h"
+#include "haptic_controller.h"
 
 //vars
-PhantomSensation ps(13, 12);
+HapticController hc(13, 12);
 StaticJsonDocument<512> json;
 StaticJsonDocument<512> tmp;
 String JSONbuffer = "";
@@ -13,7 +13,7 @@ bool new_json_arrived = false;
 //prev statesS
 bool prev_mode = false;
 int prev_firingPeriod = 100;
-PhantomSensation::Pattern prev_firingPattern = PhantomSensation::Pattern::Constant;
+HapticController::Pattern prev_firingPattern = HapticController::Pattern::Constant;
 
 //Multi Tasking
 SemaphoreHandle_t jsonMutex;
@@ -61,9 +61,9 @@ void serialTask(void *parameter){
 
 void setup() {
   Serial.begin(74880);
-  ps.update_intensity(1.0);
-  ps.update_position(1.0);
-  ps.update_pattern(PhantomSensation::Pattern::SinePulse, 1096, false);
+  hc.update_intensity(1.0);
+  hc.update_position(1.0);
+  hc.update_pattern(HapticController::Pattern::SinePulse, 1096, false);
 
   // Mutex erzeugen
   jsonMutex = xSemaphoreCreateMutex();
@@ -84,7 +84,7 @@ void setup() {
 void loop() {
 
   update_phatom_senstaion();
-  ps.process();
+  hc.process();
 }
 
 void update_phatom_senstaion(){
@@ -99,11 +99,11 @@ void update_phatom_senstaion(){
     // LOCK
     xSemaphoreTake(jsonMutex, portMAX_DELAY);
 
-    ps.update_position(float(json["ammunitionPercent"]) * 0.01f);
-    ps.update_intensity(json["isFiring"] ? (float(json["intensityPercent"]) * 0.01f) : (0.0f));
+    hc.update_position(float(json["ammunitionPercent"]) * 0.01f);
+    hc.update_intensity(json["isFiring"] ? (float(json["intensityPercent"]) * 0.01f) : (0.0f));
 
     int patternRaw = json["firingPattern"] | 0;
-    PhantomSensation::Pattern pattern = static_cast<PhantomSensation::Pattern>(patternRaw);
+    HapticController::Pattern pattern = static_cast<HapticController::Pattern>(patternRaw);
 
     if(prev_firingPattern != pattern
     || prev_firingPeriod != json["firingPeriod"]
@@ -114,7 +114,7 @@ void update_phatom_senstaion(){
         prev_firingPattern = pattern;
         prev_firingPeriod = json["firingPeriod"];
         prev_mode = json["oneShot"];
-        ps.update_pattern(pattern, json["firingPeriod"], json["oneShot"]);
+        hc.update_pattern(pattern, json["firingPeriod"], json["oneShot"]);
 
     }
 
