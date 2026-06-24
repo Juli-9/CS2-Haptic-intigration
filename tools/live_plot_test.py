@@ -5,13 +5,14 @@ from collections import deque
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtWidgets, QtCore
 
+QUEUE_SIZE = 300
 
 PORT = "COM5"
 BAUD = 74880
 
-left_data = deque(maxlen=1000)
-right_data = deque(maxlen=1000)
-diff_data = deque(maxlen=1000)
+left_data = deque(maxlen=QUEUE_SIZE)
+right_data = deque(maxlen=QUEUE_SIZE)
+diff_data = deque(maxlen=QUEUE_SIZE)
 
 
 def serial_thread():
@@ -45,7 +46,7 @@ win = pg.GraphicsLayoutWidget(
 
 pg.setConfigOption('background', 'k')
 pg.setConfigOption('foreground', 'w')
-pg.setConfigOptions(antialias=True)
+# pg.setConfigOptions(antialias=True)
 
 plot = win.addPlot()
 
@@ -54,18 +55,18 @@ plot = win.addPlot()
 plot.setLabel("left", "PWM")
 plot.setLabel("bottom", "Samples")
 plot.setYRange(0, 255)
-plot.setXRange(0, 1000)
-
-curve_left = plot.plot(
-    pen=pg.mkPen('r', width=3, style=QtCore.Qt.SolidLine)
-)
-
-curve_right = plot.plot(
-    pen=pg.mkPen('b', width=3, style=QtCore.Qt.SolidLine)
-)
+plot.setXRange(0, QUEUE_SIZE)
 
 curve_diff = plot.plot(
     pen=pg.mkPen('y', width=3, style=QtCore.Qt.DotLine)
+)
+
+curve_left = plot.plot(
+    pen=pg.mkPen('r', width=4, style=QtCore.Qt.SolidLine)
+)
+
+curve_right = plot.plot(
+    pen=pg.mkPen('b', width=4, style=QtCore.Qt.SolidLine)
 )
 
 legend = plot.addLegend()
@@ -83,7 +84,7 @@ def update():
 
 timer = QtCore.QTimer()
 timer.timeout.connect(update)
-timer.start(20)
+timer.start(18)
 
 
 threading.Thread(

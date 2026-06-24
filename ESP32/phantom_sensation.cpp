@@ -1,6 +1,11 @@
 #include <Arduino.h>
 
 #include "phantom_sensation.h"
+#include "timer.h"
+
+#define SERIAL_COM_FREQ 50
+
+Timer loop_tim;
 
 static const uint8_t logLUT[256] =
 {
@@ -150,6 +155,8 @@ PhantomSensation::PhantomSensation(uint8_t pin1, uint8_t pin2)
     pinMode(motor2_pin, OUTPUT);
 
     off();
+
+    loop_tim.start(1.0 / float(SERIAL_COM_FREQ) * 1000);
 }
 
 void PhantomSensation::off(){
@@ -208,9 +215,15 @@ void PhantomSensation::process(){
     uint8_t pwm1 = (uint8_t)(value1 * 255.0f);
     uint8_t pwm2 = (uint8_t)(value2 * 255.0f);
 
-    Serial.print(pwm1);
-    Serial.print(",");
-    Serial.println(pwm2);
+    if(loop_tim.isFinished()){
+
+        Serial.print(pwm1);
+        Serial.print(",");
+        Serial.println(pwm2);
+
+        loop_tim.reset();
+    }
+
 
     // Serial.print("pos=");        
     // Serial.print(position, 6);
