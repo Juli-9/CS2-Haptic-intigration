@@ -163,7 +163,7 @@ void PhantomSensation::update_position(float pos)
 }
 
 void PhantomSensation::update_intensity(float intens){
-    intensity = constrain(intens, 0.0f, 0.99f);
+    intensity = constrain(intens, 0.0f, 1.0f);
 }
 
 void PhantomSensation::update_pattern(PhantomSensation::Pattern p, int period, bool oneShot){
@@ -176,7 +176,6 @@ void PhantomSensation::update_pattern(PhantomSensation::Pattern p, int period, b
 
     t.start(period);
 }
-
 
 void PhantomSensation::process(){
 
@@ -191,6 +190,8 @@ void PhantomSensation::process(){
         p = 0.0f;
     }
 
+    pattern_idx = (uint8_t)(p * 255.0f);
+
     float pos = position;
     float gain1 = pos;
     float gain2 = 1.0 - pos;
@@ -201,17 +202,30 @@ void PhantomSensation::process(){
     float base1 = logLUT[idx1] / 255.0f;
     float base2 = logLUT[idx2] / 255.0f;
 
-    pattern_idx = (uint8_t)(p * 255.0f);
-    
     float value1 = base1 * intensity * pattern_bias();
     float value2 = base2 * intensity * pattern_bias();
 
     uint8_t pwm1 = (uint8_t)(value1 * 255.0f);
     uint8_t pwm2 = (uint8_t)(value2 * 255.0f);
-    
+
     Serial.print(pwm1);
     Serial.print(",");
     Serial.println(pwm2);
+
+    // Serial.print("pos=");        
+    // Serial.print(position, 6);
+
+    // Serial.print(" base1=");
+    // Serial.print(base1, 6);
+
+    // Serial.print(" intensity=");
+    // Serial.print(intensity, 6);
+
+    // Serial.print(" bias=");
+    // Serial.print(pattern_bias(), 6);
+
+    // Serial.print(" value1=");
+    // Serial.println(value1, 6);
 
     analogWrite(motor1_pin, pwm1);
     analogWrite(motor2_pin, pwm2);
@@ -244,5 +258,5 @@ float PhantomSensation::pattern_bias(){
             // Wird ausgeführt, wenn kein Case passt
             break;
     }
-    return 0;
+    return 1.0;
 }

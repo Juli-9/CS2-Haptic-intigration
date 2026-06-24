@@ -5,11 +5,11 @@
 
 //vars
 PhantomSensation ps(13, 12);
-StaticJsonDocument<256> json;
+StaticJsonDocument<512> json;
 String JSONbuffer = "";
-bool new_one_shot_arrived = false;
+bool new_json_arrived = false;
 
-//prev states
+//prev statesS
 bool prev_mode = false;
 int prev_firingPeriod = 100;
 PhantomSensation::Pattern prev_firingPattern = PhantomSensation::Pattern::Constant;
@@ -34,7 +34,7 @@ void serialTask(void *parameter){
                 DeserializationError err = deserializeJson(json, JSONbuffer);
                 if (!err)
                 {
-                  new_one_shot_arrived = json["oneShot"];
+                  new_json_arrived = true;
                 }
                 else
                 {
@@ -62,10 +62,10 @@ void serialTask(void *parameter){
 }
 
 void setup() {
-  Serial.begin(921600);
+  Serial.begin(74880);
   ps.update_intensity(1.0);
   ps.update_position(1.0);
-  ps.update_pattern(PhantomSensation::Pattern::SinePulse, 600, false);
+  ps.update_pattern(PhantomSensation::Pattern::SinePulse, 1096, false);
 
   // Mutex erzeugen
   jsonMutex = xSemaphoreCreateMutex();
@@ -86,35 +86,37 @@ void setup() {
 void loop() {
 
   update_phatom_senstaion();
-
   ps.process();
 }
 
 void update_phatom_senstaion(){
 
-  // LOCK
-  xSemaphoreTake(jsonMutex, portMAX_DELAY);
 
-  ps.update_position(float(json["ammunitionPercent"]) * 0.01f);
-  ps.update_intensity(json["isFiring"] ? (float(json["intensityPercent"]) * 0.01f) : (0.0f));
+  // Serial.println(json.as<String>());
 
-  int patternRaw = json["firingPattern"] | 0;
-  PhantomSensation::Pattern pattern = static_cast<PhantomSensation::Pattern>(patternRaw);
 
-  if (prev_firingPeriod != json["firingPeriod"] 
-    || prev_firingPattern != pattern 
-    || prev_mode != json["oneShot"]
-    || new_one_shot_arrived) 
+
+  if (new_json_arrived) 
   {
-    prev_firingPeriod = json["firingPeriod"];
+    // LOCK
+    xSemaphoreTake(jsonMutex, portMAX_DELAY);
+
+    ps.update_position(float(json["ammunitionPercent"]) * 0.01f);
+    ps.update_intensity(json["isFiring"] ? (float(json["intensityPercent"]) * 0.01f) : (0.0f));
+
+    int patternRaw = json["firingPattern"] | 0;
+    PhantomSensation::Pattern pattern = static_cast<PhantomSensation::Pattern>(patternRaw);
     prev_firingPattern = pattern;
+
+    prev_firingPeriod = json["firingPeriod"];
     prev_mode = json["oneShot"];
     ps.update_pattern(pattern, json["firingPeriod"], json["oneShot"]);
-    new_one_shot_arrived = false;
+    new_json_arrived = false;
+
+    // UNLOCK
+    xSemaphoreGive(jsonMutex);
   }
 
-  // UNLOCK
-  xSemaphoreGive(jsonMutex);
 
 }
 
