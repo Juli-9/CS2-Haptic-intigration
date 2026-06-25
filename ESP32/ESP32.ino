@@ -107,8 +107,8 @@ void update_phatom_senstaion(){
 
     if(prev_firingPattern != pattern
     || prev_firingPeriod != json["firingPeriod"]
-    || json["oneShot"]
-    || prev_mode)
+    || json["oneShot"] != prev_mode
+    || json["oneShot"])
     {
 
         prev_firingPattern = pattern;
