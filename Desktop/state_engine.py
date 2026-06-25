@@ -1,5 +1,6 @@
 import json
 import threading
+import time
 import flask
 import serial
 import numpy as np
@@ -66,6 +67,14 @@ class StateEngine:
 
         self.server_thread.start()
 
+        self.state_thread = threading.Thread(
+            target=self.state_thread,
+            daemon=True
+        )
+
+        self.state_thread.start()
+
+
     def update_state(self):
         with self.game_state_lock:
             name = self.game_state["activeWeaponName"]
@@ -106,6 +115,10 @@ class StateEngine:
 
             self.prev_state = self.state.copy() 
 
+    def state_thread(self):
+        while self.running:
+            self.update_state()
+            time.sleep(0.01)  # 100 Hz
 
     # FLASK SERVER
     def run_server(self):
@@ -140,8 +153,11 @@ class StateEngine:
 
                     self.prev_ammo = ammo_clip
 
-                elif w.get("state") == "reloading":
-                    self.game_state["activeWeaponName"] = ""
+                    return "OK", 200
+
+
+                self.game_state["activeWeaponName"] = ""
+               
                
 
 
