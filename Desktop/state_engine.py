@@ -98,10 +98,12 @@ class StateEngine:
                 is_firing = False
                 self.ammo_reduced_once = False  
 
+        if self.prev_state["oneShot"] and not is_firing: return
+
         with self.state_lock:
             self.state["isFiring"] = is_firing
             self.state["ammunitionPercent"] = ammo
-            self.state["intensityPercent"] = 50 #TO-DO
+            self.state["intensityPercent"] = 20 #TO-DO
 
             if weapon is None:
                 self.state["oneShot"] = False
@@ -111,7 +113,10 @@ class StateEngine:
                 self.state["oneShot"] = weapon["oneShot"]
 
             if self.state["oneShot"] and self.state["isFiring"] or self.state != self.prev_state:
-                self.ser.write((json.dumps(self.state) + "\n").encode())
+                state = (json.dumps(self.state) + "\n").encode()
+                self.ser.write(state)
+                print(self.state)
+                print("------------------------")
 
             self.prev_state = self.state.copy() 
 

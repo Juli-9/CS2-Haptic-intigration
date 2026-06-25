@@ -29,7 +29,7 @@ public:
     uint8_t motor2_pin;
     
     float position = 0.5f;
-    float intensity = 1.0;
+    float intensity = 0.0;
     bool one_shot = false;
     
     HapticController::Pattern pattern = HapticController::Pattern::Constant;
