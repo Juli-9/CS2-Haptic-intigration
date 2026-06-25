@@ -25,7 +25,7 @@ WEAPON_DATA = {
     "weapon_galilar":        {"hz": 10.87, "firingPattern": 3, "oneShot": False},
     "weapon_ak47":           {"hz": 10.00, "firingPattern": 3, "oneShot": False},
     "weapon_m4a1":           {"hz": 11.11, "firingPattern": 3, "oneShot": False},
-    "weapon_m4a1_silencer":  {"hz": 10.00, "firingPattern": 3, "oneShot": False},
+    "weapon_m4a1_silencer":  {"hz": 10.00, "firingPattern": 5, "oneShot": False},
     "weapon_aug":            {"hz": 10.00, "firingPattern": 3, "oneShot": False},
     "weapon_sg556":          {"hz": 10.87, "firingPattern": 3, "oneShot": False},
 

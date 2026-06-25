@@ -1,34 +1,93 @@
-import math
+import numpy as np
+import matplotlib.pyplot as plt
 
 LUT_SIZE = 256
 
-ATTACK = 0.08      # 8 %
-HOLD = 0.04        # 4 %
-DECAY_RATE = 6.0   # größer = schnelleres Ausklingen
 
-lut = []
+# ------------------------
+# Kurvenbibliothek
+# ------------------------
 
-for i in range(LUT_SIZE):
+def exp_decay(x, k=8):
+    return np.exp(-k * x)
 
-    t = i / (LUT_SIZE - 1)
 
-    if t < ATTACK:
-        # Linearer Attack
-        y = 255.0 * (t / ATTACK)
+def gamma_pulse(x, a=1.0, b=10.0):
+    y = (x ** a) * np.exp(-b * x)
+    return y / y.max()
 
-    elif t < ATTACK + HOLD:
-        # Peak halten
-        y = 255.0
 
-    else:
-        # Exponentieller Decay
-        d = (t - ATTACK - HOLD) / (1.0 - ATTACK - HOLD)
-        y = 255.0 * math.exp(-DECAY_RATE * d)
+def damped_sine(x, decay=5, cycles=2):
+    y = np.exp(-decay * x) * np.abs(np.sin(2 * np.pi * cycles * x))
+    return y / y.max()
 
-    lut.append(round(max(0, min(255, y))))
 
-print("const uint8_t deagle_lut[256] = {")
-for i in range(0, LUT_SIZE, 16):
-    line = ", ".join(f"{v:3d}" for v in lut[i:i+16])
-    print(f"    {line},")
-print("};") 
+def double_impact(x,
+                  decay=15,
+                  echo_pos=0.15,
+                  echo_amp=0.4,
+                  echo_width=200):
+    y = np.exp(-decay * x)
+    y += echo_amp * np.exp(-echo_width * (x - echo_pos) ** 2)
+    return y / y.max()
+
+
+def heavy_shot(x,
+               plateau=0.12,
+               decay=8):
+    y = np.ones_like(x)
+
+    idx = x > plateau
+    y[idx] = np.exp(-decay * (x[idx] - plateau))
+
+    return y / y.max()
+
+
+# ------------------------
+# Auswahl
+# ------------------------
+
+x = np.linspace(0, 1, LUT_SIZE)
+
+y = gamma_pulse(x)
+
+# y = double_impact(
+#     x,
+#     decay=12,
+#     echo_pos=0.12,
+#     echo_amp=0.25,
+#     echo_width=800
+# )
+
+# ------------------------
+# LUT erzeugen
+# ------------------------
+
+lut = np.round(
+    np.clip(y, 0, 1) * 255
+).astype(np.uint8)
+
+# ------------------------
+# C-Array ausgeben
+# ------------------------
+
+print("const uint8_t LUT[256] = {")
+
+for i in range(0, 256, 16):
+    row = ", ".join(f"{v:3d}" for v in lut[i:i+16])
+    print(f"    {row},")
+
+print("};")
+
+# ------------------------
+# Plot
+# ------------------------
+
+plt.figure(figsize=(10,4))
+plt.plot(x, y)
+plt.grid(True)
+plt.ylim(0, 1.05)
+plt.title("Envelope")
+plt.xlabel("normalized time")
+plt.ylabel("amplitude")
+plt.show()

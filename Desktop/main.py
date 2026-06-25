@@ -7,14 +7,14 @@ logging.getLogger("werkzeug").setLevel(logging.WARNING)
 
 PLOT_QUEUE_SIZE = 200
 PORT = "COM5"
-BAUD = 74880
+BAUD = 230400   
 
 def main() -> int:
 
     ser: Serial = Serial(PORT, BAUD)
 
     se: StateEngine = StateEngine(ser=ser)
-    plt: Plotter = Plotter(baud=BAUD, port=PORT, queue_size=PLOT_QUEUE_SIZE, ser=ser)
+    plt: Plotter = Plotter(queue_size=PLOT_QUEUE_SIZE, ser=ser)
 
     se.start()
 

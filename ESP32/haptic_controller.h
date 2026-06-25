@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include "timer.h"
 
-#define SERIAL_COM_FREQ 50
+#define SERIAL_COM_FREQ 60
 
 
 class HapticController {
@@ -13,7 +13,8 @@ public:
         SinePulse = 1,
         SawUp = 2,
         SawDown = 3,
-        HeavyShot = 4
+        HeavyShot = 4,
+        GammaPulse = 5
     };
     HapticController(uint8_t pin1, uint8_t pin2);
 

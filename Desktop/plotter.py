@@ -9,11 +9,9 @@ import pyqtgraph as pg
 
 class Plotter:
 
-    def __init__(self, port: str, baud: int, queue_size: int, ser: serial.Serial):
+    def __init__(self, queue_size: int, ser: serial.Serial):
 
         # CONFIG
-        self.port = port
-        self.baud = baud
         self.queue_size = queue_size
         self.ser = ser
 

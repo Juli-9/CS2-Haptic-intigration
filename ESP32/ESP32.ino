@@ -60,7 +60,7 @@ void serialTask(void *parameter){
 }
 
 void setup() {
-  Serial.begin(74880);
+  Serial.begin(230400);
   hc.update_intensity(0.0);
   hc.update_position(1.0);
   hc.update_pattern(HapticController::Pattern::SinePulse, 1096, false);

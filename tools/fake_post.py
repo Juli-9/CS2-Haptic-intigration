@@ -4,7 +4,7 @@ import requests
 while True:
 
     print("reloading..")
-    time.sleep(1)
+    # time.sleep(1)
     print("reloading done")
 
     ammo_max = 20
@@ -16,7 +16,7 @@ while True:
             "player": {
                 "weapons": {
                     "weapon_0": {
-                        "name": "weapon_m4a1_silencer",
+                        "name": "weapon_scar20",
                         "state": "active",
                         "ammo_clip": ammo,
                         "ammo_clip_max": ammo_max 
