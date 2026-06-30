@@ -80,6 +80,7 @@ class StateEngine:
 
     def update_state(self):
         with self.game_state_lock:
+
             name = self.game_state["activeWeaponName"]
             ammo_reduced = self.game_state["ammoReduced"]
             ammo = int(self.game_state["ammoRatio"] * 100)
@@ -88,7 +89,7 @@ class StateEngine:
 
         weapon = WEAPON_DATA.get(name)
 
-        if weapon is None:
+        if weapon is None or not self.game_state["alive"]:
             is_firing = False
         elif self.prev_weapon_name != name:
             is_firing = False
