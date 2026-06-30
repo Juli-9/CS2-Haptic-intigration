@@ -105,7 +105,7 @@ class StateEngine:
         with self.state_lock:
             self.state["isFiring"] = is_firing
             self.state["ammunitionPercent"] = ammo
-            self.state["intensityPercent"] = 100 #TO-DO
+            self.state["intensityPercent"] = int(weapon["intensity"] * 100.0)
 
             if weapon is None:
                 self.state["oneShot"] = False
