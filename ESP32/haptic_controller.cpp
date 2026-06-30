@@ -170,6 +170,10 @@ void HapticController::off(){
     analogWrite(motor2_pin, 0);
 }
 
+void HapticController::soft_stop(){
+    soft_stop_flag = true;
+}
+
 void HapticController::update_position(float pos)
 {
     position = constrain(pos, 0.0f, 1.0f);
@@ -190,12 +194,16 @@ void HapticController::update_pattern(HapticController::Pattern p, int period, b
     t.start(period);
 }
 
+void HapticController::on(){
+    soft_stop_flag = false;
+}
+
 void HapticController::process(){
 
     float p = t.progress();
 
     if (p >= 1.0f) {
-        if(one_shot){
+        if(one_shot || soft_stop_flag){
             this->off();
             return;
         }

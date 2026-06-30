@@ -18,6 +18,9 @@ public:
     };
     HapticController(uint8_t pin1, uint8_t pin2);
 
+    void soft_stop();
+
+    void on();
     
     void update_position(float pos);
     void update_intensity(float intens);
@@ -39,6 +42,7 @@ public:
 
     Timer loop_tim;
     Timer t;
+    bool soft_stop_flag = false;
     
     void off();
     float pattern_bias();

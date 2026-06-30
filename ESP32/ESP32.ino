@@ -60,6 +60,7 @@ void serialTask(void *parameter){
 }
 
 void setup() {
+  Serial.setRxBufferSize(4096);
   Serial.begin(230400);
   hc.update_intensity(0.0);
   hc.update_position(1.0);
@@ -99,8 +100,19 @@ void update_phatom_senstaion(){
     // LOCK
     xSemaphoreTake(jsonMutex, portMAX_DELAY);
 
+    if (json["isFiring"]){
+      hc.on();
+      hc.update_intensity(float(json["intensityPercent"]) * 0.01f);
+    }
+    else {
+      hc.soft_stop();
+      new_json_arrived = false;
+      // UNLOCK
+      xSemaphoreGive(jsonMutex);
+      return;
+    }
+
     hc.update_position(float(json["ammunitionPercent"]) * 0.01f);
-    hc.update_intensity(json["isFiring"] ? (float(json["intensityPercent"]) * 0.01f) : (0.0f));
 
     int patternRaw = json["firingPattern"] | 0;
     HapticController::Pattern pattern = static_cast<HapticController::Pattern>(patternRaw);
