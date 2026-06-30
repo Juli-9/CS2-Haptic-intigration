@@ -90,9 +90,11 @@ class StateEngine:
         elif weapon["oneShot"]:
             is_firing = ammo_reduced
         else:
-            if ammo_reduced: self.ammo_reduced_once = True
+            if ammo_reduced:
+                self.ammo_reduced_once = True
+                is_firing = True
 
-            if is_left_mouse_pressed() and ammo > 0:
+            elif is_left_mouse_pressed() and ammo > 0:
                 is_firing = self.ammo_reduced_once
             else:
                 is_firing = False
