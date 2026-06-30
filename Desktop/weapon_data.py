@@ -42,7 +42,7 @@ WEAPON_DATA = {
     "weapon_xm1014":         {"hz": 4.00, "firingPattern": 4, "oneShot": False, "intensity": 0.90},
 
     # Machine Guns
-    "weapon_m249":           {"hz": 12.50, "firingPattern": 1, "oneShot": False, "intensity": 0.88},
+    "weapon_m249":           {"hz": 12.50, "firingPattern": 1, "oneShot": False, "intensity": 1.00},
     "weapon_negev":          {"hz": 13.33, "firingPattern": 1, "oneShot": False, "intensity": 0.94},
 }
 

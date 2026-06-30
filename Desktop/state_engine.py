@@ -113,7 +113,6 @@ class StateEngine:
         with self.state_lock:
             self.state["isFiring"] = is_firing
             self.state["ammunitionPercent"] = ammo
-            self.state["intensityPercent"] = int(weapon["intensity"] * 100.0)
 
             if weapon is None:
                 self.state["oneShot"] = False
@@ -121,6 +120,7 @@ class StateEngine:
                 self.state["firingPeriod"] = round(1000 / weapon["hz"])
                 self.state["firingPattern"] = weapon["firingPattern"]
                 self.state["oneShot"] = weapon["oneShot"]
+                self.state["intensityPercent"] = int(weapon["intensity"] * 100.0)
 
             if self.state["oneShot"] and self.state["isFiring"] or self.state != self.prev_state:
                 state = (json.dumps(self.state) + "\n").encode()
