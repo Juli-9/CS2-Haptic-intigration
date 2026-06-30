@@ -103,7 +103,7 @@ class StateEngine:
         with self.state_lock:
             self.state["isFiring"] = is_firing
             self.state["ammunitionPercent"] = ammo
-            self.state["intensityPercent"] = 20 #TO-DO
+            self.state["intensityPercent"] = 100 #TO-DO
 
             if weapon is None:
                 self.state["oneShot"] = False
@@ -148,6 +148,9 @@ class StateEngine:
             with self.game_state_lock:
                 if w.get("state") == "active":
                     self.game_state["activeWeaponName"] = w.get("name")
+
+                    if not WEAPON_DATA.get(self.game_state["activeWeaponName"]):
+                        continue
 
                     ammo_clip = w.get("ammo_clip")
                     ammo_clip_max = w.get("ammo_clip_max")
