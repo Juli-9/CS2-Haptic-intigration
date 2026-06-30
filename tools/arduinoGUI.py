@@ -5,7 +5,7 @@ import time
 
 #------------Arduino connection--------------
 
-ser = serial.Serial("COM5", 74880)
+ser = serial.Serial("COM3", 74880)
 
 dataToSend = {
     "isFiring": False,

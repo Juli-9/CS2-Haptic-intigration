@@ -90,9 +90,11 @@ class StateEngine:
         elif weapon["oneShot"]:
             is_firing = ammo_reduced
         else:
-            if ammo_reduced: self.ammo_reduced_once = True
+            if ammo_reduced:
+                self.ammo_reduced_once = True
+                is_firing = True
 
-            if is_left_mouse_pressed() and ammo > 0:
+            elif is_left_mouse_pressed() and ammo > 0:
                 is_firing = self.ammo_reduced_once
             else:
                 is_firing = False
@@ -103,7 +105,7 @@ class StateEngine:
         with self.state_lock:
             self.state["isFiring"] = is_firing
             self.state["ammunitionPercent"] = ammo
-            self.state["intensityPercent"] = 20 #TO-DO
+            self.state["intensityPercent"] = 100 #TO-DO
 
             if weapon is None:
                 self.state["oneShot"] = False
@@ -148,6 +150,9 @@ class StateEngine:
             with self.game_state_lock:
                 if w.get("state") == "active":
                     self.game_state["activeWeaponName"] = w.get("name")
+
+                    if not WEAPON_DATA.get(self.game_state["activeWeaponName"]):
+                        continue
 
                     ammo_clip = w.get("ammo_clip")
                     ammo_clip_max = w.get("ammo_clip_max")
