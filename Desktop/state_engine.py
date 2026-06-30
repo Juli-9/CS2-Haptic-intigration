@@ -36,7 +36,8 @@ class StateEngine:
         self.game_state: dict = {
         "activeWeaponName" : "",
         "ammoRatio": 0.0,
-        "ammoReduced" : False
+        "ammoReduced" : False,
+        "alive" : False
         }
 
         self.state: dict = {
@@ -47,6 +48,8 @@ class StateEngine:
             "intensityPercent": 50,
             "oneShot" : False
         }
+
+        self.prev_weapon_name: str = ""
 
         self.ammo_reduced_once = False
         self.prev_state = self.state.copy()
@@ -87,6 +90,8 @@ class StateEngine:
 
         if weapon is None:
             is_firing = False
+        elif self.prev_weapon_name != name:
+            is_firing = False
         elif weapon["oneShot"]:
             is_firing = ammo_reduced
         else:
@@ -99,6 +104,8 @@ class StateEngine:
             else:
                 is_firing = False
                 self.ammo_reduced_once = False  
+
+        self.prev_weapon_name = name
 
         if self.prev_state["oneShot"] and not is_firing: return
 
@@ -144,6 +151,7 @@ class StateEngine:
         data = flask.request.json or {}
 
         player = data.get("player", {})
+        alive = player["state"]["health"] > 0
         weapons = player.get("weapons", {})
 
         for key, w in weapons.items():
@@ -153,7 +161,8 @@ class StateEngine:
 
                     if not WEAPON_DATA.get(self.game_state["activeWeaponName"]):
                         continue
-
+                    
+                    self.game_state["alive"] = alive
                     ammo_clip = w.get("ammo_clip")
                     ammo_clip_max = w.get("ammo_clip_max")
                     self.game_state["ammoRatio"] =  ammo_clip / ammo_clip_max if ammo_clip_max > 0 else 0.0
