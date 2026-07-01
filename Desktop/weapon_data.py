@@ -46,4 +46,4 @@ WEAPON_DATA = {
     "weapon_negev":          {"hz": 13.33, "firingPattern": 1, "oneShot": False, "intensity": 0.94},
 }
 
-print(len(WEAPON_DATA))
+# print(len(WEAPON_DATA))

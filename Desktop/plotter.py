@@ -43,6 +43,9 @@ class Plotter:
         self.curve_left = self.plot.plot(pen=pg.mkPen('r', width=4))
         self.curve_right = self.plot.plot(pen=pg.mkPen('b', width=4))
 
+        self.plot.showGrid(x=True, y=True, alpha=0.3)
+
+
         legend = self.plot.addLegend()
         legend.addItem(self.curve_left, "PWM1")
         legend.addItem(self.curve_right, "PWM2")

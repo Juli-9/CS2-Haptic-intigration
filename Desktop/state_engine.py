@@ -152,7 +152,10 @@ class StateEngine:
         data = flask.request.json or {}
 
         player = data.get("player", {})
-        alive = player["state"]["health"] > 0
+        player_state = player.get("state", {})
+        player_health = player_state.get("health", 0)
+
+        alive = player_health > 0
         weapons = player.get("weapons", {})
 
         for key, w in weapons.items():
