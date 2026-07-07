@@ -7,7 +7,7 @@ import logging
 logging.getLogger("werkzeug").setLevel(logging.WARNING)
 
 PLOT_QUEUE_SIZE = 200
-BAUD = 230400   
+BAUD = 115200   
 
 def select_port() -> str:
     ports = list(list_ports.comports())

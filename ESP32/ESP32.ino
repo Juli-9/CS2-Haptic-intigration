@@ -26,6 +26,8 @@ void serialTask(void *parameter){
         {
             char c = Serial.read();
 
+            if (c == '\r') continue;
+
             // Ende einer Nachricht
             if (c == '\n')
             {
@@ -61,7 +63,7 @@ void serialTask(void *parameter){
 
 void setup() {
   Serial.setRxBufferSize(4096);
-  Serial.begin(230400);
+  Serial.begin(115200);
   hc.update_intensity(0.0);
   hc.update_position(1.0);
   hc.update_pattern(HapticController::Pattern::SinePulse, 1096, false);

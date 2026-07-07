@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <Arduino.h>
 
 #include "haptic_controller.h"
@@ -231,9 +232,9 @@ void HapticController::process(){
 
     if(loop_tim.isFinished()){
 
-        Serial.print(pwm1);
-        Serial.print(",");
-        Serial.println(pwm2);
+        char buff[32];
+        snprintf(buff, 32, "%u,%u\n", pwm1, pwm2);
+        Serial.write(buff);
 
         loop_tim.reset();
     }
