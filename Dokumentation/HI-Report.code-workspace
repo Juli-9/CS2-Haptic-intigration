@@ -1,0 +1,35 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "extensions": {
+        "recommendations": [
+            "myriad-dreamin.tinymist",
+            "EditorConfig.EditorConfig"
+        ],
+    },
+    "settings": {
+        "tinymist.systemFonts": false,
+        "tinymist.fontPaths": [
+            "${workspaceFolder}/fonts"
+        ],
+        "tinymist.outputPath": "${workspaceFolder}/out/$name"
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "just build",
+                "type": "shell",
+                "command": "just build",
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "isBackground": false
+            }
+        ]
+    }
+}

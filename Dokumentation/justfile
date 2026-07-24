@@ -1,0 +1,36 @@
+set windows-shell := ["powershell.exe", "-NoLogo", "-NoProfile", "-Command"]
+TYPST_IMAGE := "ghcr.io/typst/typst:0.14.0"
+SRC_DIR := "./src"
+OUT_DIR := "./out"
+
+PODMAN_CMD := "podman run --rm              \
+                --entrypoint=''             \
+                --userns=keep-id            \
+                -v '.:/app:Z'               \
+                --workdir '/app'"
+
+[private]
+@default:
+    just --list --unsorted
+
+# Builds `main.typ` to the `out`-directory
+build:
+    {{PODMAN_CMD}} '{{TYPST_IMAGE}}' sh -c "    \
+        mkdir -p '{{OUT_DIR}}' &&               \
+        typst compile --font-path='./fonts/' '{{SRC_DIR}}/main.typ' '{{OUT_DIR}}/main.pdf'"
+
+# Builds `help.typ` to the `out`-directory
+build-help:
+    {{PODMAN_CMD}} '{{TYPST_IMAGE}}' sh -c "    \
+        mkdir -p '{{OUT_DIR}}' &&               \
+        typst compile --font-path='./fonts/' '{{SRC_DIR}}/help.typ' '{{OUT_DIR}}/help.pdf'"
+
+# Deletes `out`-directory
+clean:
+    {{PODMAN_CMD}} '{{TYPST_IMAGE}}' rm -rf '{{OUT_DIR}}'
+
+
+# Opens a shell for debugging purposes
+[group("Maintainance")]
+shell:
+    {{PODMAN_CMD}} -ti '{{TYPST_IMAGE}}' sh
